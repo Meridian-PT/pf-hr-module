@@ -31,8 +31,8 @@
 
     body {
       font-family: -apple-system, 'Segoe UI', sans-serif;
-      background: var(--pf-bg);
-      color: var(--pf-text);
+      background: var(--pf-bg-light);
+      color: var(--pf-text-light);
       line-height: 1.7;
       font-size: .85rem;
       padding: 1.2rem;
@@ -54,19 +54,19 @@
     .page-title {
       font-size: clamp(1.2rem, 2.8vw, 1.6rem);
       font-weight: 700;
-      color: var(--pf-text);
+      color: var(--pf-text-light);
       margin-bottom: .4rem;
     }
     .page-subtitle {
       font-size: .82rem;
-      color: var(--pf-muted);
+      color: var(--pf-muted-light);
       margin-bottom: 1.4rem;
     }
 
     /* Cards -- 3px left accent bar */
     .pf-card {
-      background: var(--pf-card);
-      border: 1px solid var(--pf-border);
+      background: var(--pf-card-light);
+      border: 1px solid var(--pf-border-light);
       border-radius: 10px;
       padding: 1.3rem 1.6rem;
       position: relative;
@@ -88,7 +88,7 @@
     .card-title {
       font-size: clamp(1rem, 2vw, 1.15rem);
       font-weight: 700;
-      color: var(--pf-text);
+      color: var(--pf-text-light);
       margin-bottom: .6rem;
     }
 
@@ -107,7 +107,7 @@
     .pf-chip.green { background: rgba(16,185,129,.1); color: var(--pf-green); }
     .pf-chip.red { background: rgba(239,68,68,.1); color: var(--pf-red); }
     .pf-chip.gold { background: rgba(212,165,116,.1); color: var(--pf-gold); }
-    .pf-chip.muted { background: rgba(122,138,158,.1); color: var(--pf-muted); }
+    .pf-chip.muted { background: rgba(122,138,158,.1); color: var(--pf-muted-light); }
 
     /* Status pills -- 18px square, 4px radius */
     .status-pill {
@@ -117,7 +117,7 @@
       border: 1.5px solid;
       vertical-align: middle;
     }
-    .status-pill.pending { border-color: var(--pf-muted); background: transparent; }
+    .status-pill.pending { border-color: var(--pf-muted-light); background: transparent; }
     .status-pill.in-progress { border-color: var(--pf-orange); background: rgba(241,66,11,.2); }
     .status-pill.done { border-color: var(--pf-green); background: rgba(16,185,129,.2); }
 
@@ -139,13 +139,13 @@
     .tab-nav {
       display: flex;
       gap: 0;
-      border-bottom: 1px solid var(--pf-border);
+      border-bottom: 1px solid var(--pf-border-light);
       margin-bottom: 1.4rem;
     }
     .tab-btn {
       background: none;
       border: none;
-      color: var(--pf-muted);
+      color: var(--pf-muted-light);
       font-size: .8rem;
       font-weight: 600;
       padding: .7rem 1.2rem;
@@ -153,7 +153,7 @@
       border-bottom: 2px solid transparent;
       transition: all .2s;
     }
-    .tab-btn:hover { color: var(--pf-text); }
+    .tab-btn:hover { color: var(--pf-text-light); }
     .tab-btn.active {
       color: var(--pf-blue);
       border-bottom-color: var(--pf-blue);
@@ -173,14 +173,14 @@
       font-weight: 700;
       letter-spacing: .15em;
       text-transform: uppercase;
-      color: var(--pf-muted);
+      color: var(--pf-muted-light);
       padding: .7rem .8rem;
-      border-bottom: 1px solid var(--pf-border);
+      border-bottom: 1px solid var(--pf-border-light);
     }
     .pf-table td {
       padding: .7rem .8rem;
-      border-bottom: 1px solid var(--pf-border);
-      color: var(--pf-text);
+      border-bottom: 1px solid var(--pf-border-light);
+      color: var(--pf-text-light);
     }
     .pf-table tr:last-child td { border-bottom: none; }
     .pf-table tr:hover td { background: rgba(42,147,193,.04); }
@@ -198,17 +198,17 @@
     .pf-btn:hover { opacity: .85; }
     .pf-btn.primary { background: var(--pf-orange); color: #fff; }
     .pf-btn.secondary { background: var(--pf-blue); color: #fff; }
-    .pf-btn.outline { background: none; border: 1px solid var(--pf-border); color: var(--pf-text); }
+    .pf-btn.outline { background: none; border: 1px solid var(--pf-border-light); color: var(--pf-text-light); }
     .pf-btn.sm { font-size: .7rem; padding: .3rem .8rem; }
 
     /* Form fields */
     .pf-input, .pf-select {
       width: 100%;
       padding: .5rem .8rem;
-      background: var(--pf-surface);
-      border: 1px solid var(--pf-border);
+      background: var(--pf-bg-light);
+      border: 1px solid var(--pf-border-light);
       border-radius: 6px;
-      color: var(--pf-text);
+      color: var(--pf-text-light);
       font-size: .82rem;
       font-family: inherit;
       line-height: 1.7;
@@ -219,7 +219,7 @@
       font-weight: 700;
       letter-spacing: .15em;
       text-transform: uppercase;
-      color: var(--pf-muted);
+      color: var(--pf-muted-light);
       margin-bottom: .3rem;
       display: block;
     }
@@ -227,7 +227,7 @@
 
     /* Metric stat */
     .stat-box {
-      background: var(--pf-surface);
+      background: var(--pf-bg-light);
       border-radius: 8px;
       padding: .8rem;
       text-align: center;
@@ -242,14 +242,14 @@
       font-weight: 700;
       letter-spacing: .15em;
       text-transform: uppercase;
-      color: var(--pf-muted);
+      color: var(--pf-muted-light);
       margin-top: .2rem;
     }
 
     /* Progress bar */
     .pf-progress {
       height: 6px;
-      background: var(--pf-border);
+      background: var(--pf-border-light);
       border-radius: 3px;
       overflow: hidden;
       margin-top: .5rem;
@@ -266,18 +266,18 @@
       justify-content: space-between;
       align-items: center;
       padding: .6rem 0;
-      border-bottom: 1px solid var(--pf-border);
+      border-bottom: 1px solid var(--pf-border-light);
     }
     .info-row:last-child { border-bottom: none; }
-    .info-key { color: var(--pf-muted); font-size: .82rem; }
-    .info-val { color: var(--pf-text); font-size: .82rem; font-weight: 500; }
+    .info-key { color: var(--pf-muted-light); font-size: .82rem; }
+    .info-val { color: var(--pf-text-light); font-size: .82rem; font-weight: 500; }
 
     /* Toast */
     .pf-toast {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: var(--pf-card);
+      background: var(--pf-card-light);
       border: 1px solid var(--pf-green);
       border-radius: 8px;
       padding: .8rem 1.2rem;
@@ -297,8 +297,8 @@
       display: flex; align-items: center; justify-content: center;
     }
     .pf-modal {
-      background: var(--pf-card);
-      border: 1px solid var(--pf-border);
+      background: var(--pf-card-light);
+      border: 1px solid var(--pf-border-light);
       border-radius: 10px;
       padding: 1.6rem;
       max-width: 500px;
