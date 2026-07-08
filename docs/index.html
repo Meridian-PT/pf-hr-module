@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PF HR Module</title>
+  <style>
+    /* ================================================================
+       PIER FOUNDATIONS DESIGN TOKENS (from Tether, verbatim)
+       ================================================================ */
+    :root {
+      --pf-blue:    #2a93c1;
+      --pf-orange:  #f1420b;
+      --pf-green:   #10b981;
+      --pf-gold:    #D4A574;
+      --pf-red:     #ef4444;
+      --pf-bg:      #0b0f14;
+      --pf-surface: #131820;
+      --pf-card:    #171e28;
+      --pf-border:  #1e2a38;
+      --pf-text:    #e8ecf0;
+      --pf-muted:   #7a8a9e;
+      --pf-bg-light:     #ffffff;
+      --pf-card-light:   #f7f9fb;
+      --pf-border-light: #e3e8ee;
+      --pf-text-light:   #0b0f14;
+      --pf-muted-light:  #5a6b7e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      background: var(--pf-bg);
+      color: var(--pf-text);
+      line-height: 1.7;
+      font-size: .85rem;
+      padding: 1.2rem;
+      min-height: 100vh;
+    }
+
+    /* Section labels */
+    .section-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--pf-orange);
+      margin-bottom: .6rem;
+    }
+    .section-label.blue { color: var(--pf-blue); }
+
+    /* Titles */
+    .page-title {
+      font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+      font-weight: 700;
+      color: var(--pf-text);
+      margin-bottom: .4rem;
+    }
+    .page-subtitle {
+      font-size: .82rem;
+      color: var(--pf-muted);
+      margin-bottom: 1.4rem;
+    }
+
+    /* Cards -- 3px left accent bar */
+    .pf-card {
+      background: var(--pf-card);
+      border: 1px solid var(--pf-border);
+      border-radius: 10px;
+      padding: 1.3rem 1.6rem;
+      position: relative;
+      margin-bottom: .8rem;
+    }
+    .pf-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 10px 0 0 10px;
+      background: var(--pf-blue);
+    }
+    .pf-card.accent-orange::before { background: var(--pf-orange); }
+    .pf-card.accent-green::before { background: var(--pf-green); }
+    .pf-card.accent-gold::before { background: var(--pf-gold); }
+    .pf-card.accent-red::before { background: var(--pf-red); }
+
+    .card-title {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      font-weight: 700;
+      color: var(--pf-text);
+      margin-bottom: .6rem;
+    }
+
+    /* Chips */
+    .pf-chip {
+      display: inline-block;
+      border-radius: 3px;
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+    }
+    .pf-chip.blue { background: rgba(42,147,193,.1); color: var(--pf-blue); }
+    .pf-chip.orange { background: rgba(241,66,11,.1); color: var(--pf-orange); }
+    .pf-chip.green { background: rgba(16,185,129,.1); color: var(--pf-green); }
+    .pf-chip.red { background: rgba(239,68,68,.1); color: var(--pf-red); }
+    .pf-chip.gold { background: rgba(212,165,116,.1); color: var(--pf-gold); }
+    .pf-chip.muted { background: rgba(122,138,158,.1); color: var(--pf-muted); }
+
+    /* Status pills -- 18px square, 4px radius */
+    .status-pill {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      border: 1.5px solid;
+      vertical-align: middle;
+    }
+    .status-pill.pending { border-color: var(--pf-muted); background: transparent; }
+    .status-pill.in-progress { border-color: var(--pf-orange); background: rgba(241,66,11,.2); }
+    .status-pill.done { border-color: var(--pf-green); background: rgba(16,185,129,.2); }
+
+    /* Grids */
+    .pf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: .8rem;
+      margin-bottom: 1.2rem;
+    }
+    .pf-grid-sm {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: .8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Tab nav */
+    .tab-nav {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--pf-border);
+      margin-bottom: 1.4rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--pf-muted);
+      font-size: .8rem;
+      font-weight: 600;
+      padding: .7rem 1.2rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .2s;
+    }
+    .tab-btn:hover { color: var(--pf-text); }
+    .tab-btn.active {
+      color: var(--pf-blue);
+      border-bottom-color: var(--pf-blue);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Tables */
+    .pf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+    }
+    .pf-table th {
+      text-align: left;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--pf-muted);
+      padding: .7rem .8rem;
+      border-bottom: 1px solid var(--pf-border);
+    }
+    .pf-table td {
+      padding: .7rem .8rem;
+      border-bottom: 1px solid var(--pf-border);
+      color: var(--pf-text);
+    }
+    .pf-table tr:last-child td { border-bottom: none; }
+    .pf-table tr:hover td { background: rgba(42,147,193,.04); }
+
+    /* Buttons */
+    .pf-btn {
+      border: none;
+      border-radius: 6px;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .5rem 1.2rem;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .pf-btn:hover { opacity: .85; }
+    .pf-btn.primary { background: var(--pf-orange); color: #fff; }
+    .pf-btn.secondary { background: var(--pf-blue); color: #fff; }
+    .pf-btn.outline { background: none; border: 1px solid var(--pf-border); color: var(--pf-text); }
+    .pf-btn.sm { font-size: .7rem; padding: .3rem .8rem; }
+
+    /* Form fields */
+    .pf-input, .pf-select {
+      width: 100%;
+      padding: .5rem .8rem;
+      background: var(--pf-surface);
+      border: 1px solid var(--pf-border);
+      border-radius: 6px;
+      color: var(--pf-text);
+      font-size: .82rem;
+      font-family: inherit;
+      line-height: 1.7;
+    }
+    .pf-input:focus, .pf-select:focus { outline: none; border-color: var(--pf-blue); }
+    .field-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--pf-muted);
+      margin-bottom: .3rem;
+      display: block;
+    }
+    .field-group { margin-bottom: .8rem; }
+
+    /* Metric stat */
+    .stat-box {
+      background: var(--pf-surface);
+      border-radius: 8px;
+      padding: .8rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--pf-blue);
+    }
+    .stat-label {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--pf-muted);
+      margin-top: .2rem;
+    }
+
+    /* Progress bar */
+    .pf-progress {
+      height: 6px;
+      background: var(--pf-border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: .5rem;
+    }
+    .pf-progress-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .4s ease;
+    }
+
+    /* Info row */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--pf-border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: var(--pf-muted); font-size: .82rem; }
+    .info-val { color: var(--pf-text); font-size: .82rem; font-weight: 500; }
+
+    /* Toast */
+    .pf-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--pf-card);
+      border: 1px solid var(--pf-green);
+      border-radius: 8px;
+      padding: .8rem 1.2rem;
+      color: var(--pf-green);
+      font-size: .82rem;
+      font-weight: 600;
+      z-index: 9999;
+      animation: toastIn .3s ease;
+    }
+    @keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Modal overlay */
+    .pf-modal-overlay {
+      position: fixed; top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,.7);
+      z-index: 5000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pf-modal {
+      background: var(--pf-card);
+      border: 1px solid var(--pf-border);
+      border-radius: 10px;
+      padding: 1.6rem;
+      max-width: 500px;
+      width: 90%;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+  /* ================================================================
+     PIER FOUNDATIONS HR MODULE
+     Phase 1: Records, Onboarding, Policies, PTO
+     Designed as iframe-embeddable module (NO top nav, shell owns chrome)
+     ================================================================ */
+
+  /* -- Iframe handshake with PF portal shell -- */
+  var PF_SESSION = null;
+  window.addEventListener('message', function(event) {
+    /* In production: validate event.origin === 'https://pf-platform.pages.dev' */
+    if (event.data && event.data.type === 'PF_SESSION') {
+      PF_SESSION = event.data;
+      initModule(PF_SESSION.user, PF_SESSION.role);
+      window.parent.postMessage({ type: 'PF_MODULE_READY', module: 'hr' }, '*');
+    }
+  });
+
+  /* -- Demo mode: if not in iframe, self-init -- */
+  var IN_IFRAME = (window.self !== window.top);
+  if (!IN_IFRAME) {
+    document.addEventListener('DOMContentLoaded', function() {
+      initModule({ name: 'Brad Thompson', email: 'brad@pierfoundations.ca' }, 'admin');
+    });
+  }
+
+  var STATE = {
+    currentTab: 'records',
+    employees: [
+      { id: 'PF-0001', name: 'Brad Thompson', title: 'President', department: 'Executive', location: 'Toronto, ON', startDate: '2018-01-15', status: 'active', email: 'brad@pierfoundations.ca', phone: '(416) 555-0101', emergencyContact: 'Sarah Thompson / (416) 555-0102' },
+      { id: 'PF-0002', name: 'Peter Novak', title: 'VP Operations', department: 'Operations', location: 'Toronto, ON', startDate: '2019-06-01', status: 'active', email: 'peter@pierfoundations.ca', phone: '(416) 555-0103', emergencyContact: 'Maria Novak / (416) 555-0104' },
+      { id: 'PF-0003', name: 'Jamie Reeves', title: 'Project Manager', department: 'Operations', location: 'Hamilton, ON', startDate: '2021-03-15', status: 'active', email: 'jamie@pierfoundations.ca', phone: '(905) 555-0201', emergencyContact: 'Dana Reeves / (905) 555-0202' },
+      { id: 'PF-0004', name: 'Tina Marchetti', title: 'Office Manager', department: 'Admin', location: 'Toronto, ON', startDate: '2020-09-01', status: 'active', email: 'tina@pierfoundations.ca', phone: '(416) 555-0105', emergencyContact: 'Marco Marchetti / (416) 555-0106' },
+      { id: 'PF-0005', name: 'Dylan Osei', title: 'Site Supervisor', department: 'Field Ops', location: 'Mississauga, ON', startDate: '2022-01-10', status: 'active', email: 'dylan@pierfoundations.ca', phone: '(905) 555-0301', emergencyContact: 'Ama Osei / (905) 555-0302' },
+      { id: 'PF-0006', name: 'Priya Shah', title: 'Bookkeeper', department: 'Finance', location: 'Toronto, ON', startDate: '2023-04-01', status: 'active', email: 'priya@pierfoundations.ca', phone: '(416) 555-0107', emergencyContact: 'Raj Shah / (416) 555-0108' },
+      { id: 'PF-0007', name: 'Marcus Chen', title: 'Field Technician', department: 'Field Ops', location: 'Brampton, ON', startDate: '2024-02-12', status: 'active', email: 'marcus@pierfoundations.ca', phone: '(905) 555-0401', emergencyContact: 'Lin Chen / (905) 555-0402' },
+      { id: 'PF-0008', name: 'Sarah Okafor', title: 'Estimator', department: 'Operations', location: 'Toronto, ON', startDate: '2024-08-19', status: 'onboarding', email: 'sarah@pierfoundations.ca', phone: '(416) 555-0109', emergencyContact: 'Emeka Okafor / (416) 555-0110' }
+    ],
+    onboardingTasks: [
+      { id: 1, employee: 'Sarah Okafor', task: 'Welcome email sent', status: 'done', dueDay: 'Pre-start' },
+      { id: 2, employee: 'Sarah Okafor', task: 'IT equipment ordered', status: 'done', dueDay: 'Pre-start' },
+      { id: 3, employee: 'Sarah Okafor', task: 'Office tour and introductions', status: 'done', dueDay: 'Day 1' },
+      { id: 4, employee: 'Sarah Okafor', task: 'Health & safety orientation (OHSA)', status: 'in-progress', dueDay: 'Day 1' },
+      { id: 5, employee: 'Sarah Okafor', task: 'HR paperwork (TD1, direct deposit, benefits enrollment)', status: 'in-progress', dueDay: 'Day 1-2' },
+      { id: 6, employee: 'Sarah Okafor', task: 'Role-specific training plan review', status: 'pending', dueDay: 'Week 1' },
+      { id: 7, employee: 'Sarah Okafor', task: 'Meet with direct manager (goals and expectations)', status: 'pending', dueDay: 'Week 1' },
+      { id: 8, employee: 'Sarah Okafor', task: 'System access setup (estimating software, email, SharePoint)', status: 'pending', dueDay: 'Week 1' },
+      { id: 9, employee: 'Sarah Okafor', task: 'First project shadow assignment', status: 'pending', dueDay: 'Week 2' },
+      { id: 10, employee: 'Sarah Okafor', task: '30-day check-in scheduled', status: 'pending', dueDay: 'Day 5' },
+      { id: 11, employee: 'Sarah Okafor', task: '60-day check-in scheduled', status: 'pending', dueDay: 'Day 5' },
+      { id: 12, employee: 'Sarah Okafor', task: '90-day probation review', status: 'pending', dueDay: 'Day 5' }
+    ],
+    policies: [
+      { id: 1, name: 'Health & Safety Policy (Ontario)', jurisdiction: 'Ontario', status: 'acknowledged', version: '1.0', category: 'Safety' },
+      { id: 2, name: 'Workplace Harassment Policy (Ontario)', jurisdiction: 'Ontario', status: 'acknowledged', version: '1.0', category: 'Compliance' },
+      { id: 3, name: 'Progressive Discipline Policy', jurisdiction: 'Ontario', status: 'pending', version: '1.0', category: 'HR' },
+      { id: 4, name: 'Confidentiality & IP Agreement', jurisdiction: 'Universal', status: 'acknowledged', version: '1.0', category: 'Legal' },
+      { id: 5, name: 'Remote Work Policy', jurisdiction: 'Universal', status: 'pending', version: '1.0', category: 'HR' },
+      { id: 6, name: 'Drug & Alcohol Policy', jurisdiction: 'Universal', status: 'acknowledged', version: '1.0', category: 'Safety' },
+      { id: 7, name: 'Vehicle & Fleet Policy', jurisdiction: 'Universal', status: 'pending', version: '1.0', category: 'Safety' },
+      { id: 8, name: 'Fall Protection (Construction)', jurisdiction: 'Construction', status: 'acknowledged', version: '1.0', category: 'Safety' },
+      { id: 9, name: 'Confined Space Entry (Construction)', jurisdiction: 'Construction', status: 'pending', version: '1.0', category: 'Safety' },
+      { id: 10, name: 'Hot Work Permit Policy', jurisdiction: 'Construction', status: 'pending', version: '1.0', category: 'Safety' }
+    ],
+    ptoBalances: [
+      { type: 'Vacation', total: 10, used: 3, pending: 2 },
+      { type: 'Sick Days', total: 3, used: 0, pending: 0 },
+      { type: 'Personal Days', total: 3, used: 1, pending: 0 },
+      { type: 'Bereavement', total: 5, used: 0, pending: 0 }
+    ],
+    ptoRequests: [
+      { id: 1, employee: 'Jamie Reeves', type: 'Vacation', start: '2026-07-21', end: '2026-07-25', days: 5, status: 'pending', reason: 'Family cottage' },
+      { id: 2, employee: 'Dylan Osei', type: 'Sick Day', start: '2026-07-07', end: '2026-07-07', days: 1, status: 'approved', reason: '' },
+      { id: 3, employee: 'Tina Marchetti', type: 'Vacation', start: '2026-08-11', end: '2026-08-15', days: 5, status: 'approved', reason: 'Summer holiday' },
+      { id: 4, employee: 'Marcus Chen', type: 'Personal', start: '2026-07-14', end: '2026-07-14', days: 1, status: 'pending', reason: 'Moving day' },
+      { id: 5, employee: 'Priya Shah', type: 'Vacation', start: '2026-07-28', end: '2026-07-30', days: 3, status: 'pending', reason: 'Trip to Montreal' }
+    ]
+  };
+
+  function initModule(user, role) {
+    render();
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
+
+  function toast(msg) {
+    var t = document.createElement('div');
+    t.className = 'pf-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 3000);
+  }
+
+  function switchTab(tab) {
+    STATE.currentTab = tab;
+    render();
+  }
+
+  function render() {
+    var tabs = [
+      { id: 'records', label: 'Employee Records' },
+      { id: 'onboarding', label: 'Onboarding' },
+      { id: 'policies', label: 'Policies' },
+      { id: 'timeoff', label: 'Time Off' }
+    ];
+
+    var tabNav = '<div class="tab-nav">' + tabs.map(function(t) {
+      return '<button class="tab-btn' + (STATE.currentTab === t.id ? ' active' : '') + '" onclick="switchTab(\'' + t.id + '\')">' + t.label + '</button>';
+    }).join('') + '</div>';
+
+    var content = '';
+    switch(STATE.currentTab) {
+      case 'records': content = renderRecords(); break;
+      case 'onboarding': content = renderOnboarding(); break;
+      case 'policies': content = renderPolicies(); break;
+      case 'timeoff': content = renderTimeOff(); break;
+    }
+
+    /* Stats bar */
+    var stats = '<div class="pf-grid-sm" style="margin-bottom:1.4rem;">' +
+      '<div class="stat-box"><div class="stat-value">' + STATE.employees.length + '</div><div class="stat-label">Employees</div></div>' +
+      '<div class="stat-box"><div class="stat-value">' + STATE.employees.filter(function(e){return e.status==='onboarding'}).length + '</div><div class="stat-label">Onboarding</div></div>' +
+      '<div class="stat-box"><div class="stat-value" style="color:var(--pf-green);">' + STATE.policies.filter(function(p){return p.status==='acknowledged'}).length + '/' + STATE.policies.length + '</div><div class="stat-label">Policies Signed</div></div>' +
+      '<div class="stat-box"><div class="stat-value" style="color:var(--pf-orange);">' + STATE.ptoRequests.filter(function(r){return r.status==='pending'}).length + '</div><div class="stat-label">PTO Pending</div></div>' +
+    '</div>';
+
+    document.getElementById('app').innerHTML = '' +
+      '<div class="section-label">PIER FOUNDATIONS</div>' +
+      '<div class="page-title">Human Resources</div>' +
+      '<div class="page-subtitle">Employee records, onboarding, policies, and time off management</div>' +
+      stats + tabNav + content;
+  }
+
+  /* ================================================================
+     TAB: EMPLOYEE RECORDS
+     ================================================================ */
+
+  function renderRecords() {
+    var statusChip = function(s) {
+      if (s === 'active') return '<span class="pf-chip green">ACTIVE</span>';
+      if (s === 'onboarding') return '<span class="pf-chip orange">ONBOARDING</span>';
+      return '<span class="pf-chip muted">' + s.toUpperCase() + '</span>';
+    };
+
+    var rows = STATE.employees.map(function(e) {
+      return '<tr onclick="showEmployee(\'' + e.id + '\')" style="cursor:pointer;">' +
+        '<td><strong>' + esc(e.name) + '</strong></td>' +
+        '<td>' + esc(e.title) + '</td>' +
+        '<td>' + esc(e.department) + '</td>' +
+        '<td>' + esc(e.location) + '</td>' +
+        '<td>' + esc(e.startDate) + '</td>' +
+        '<td>' + statusChip(e.status) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    return '' +
+      '<div class="pf-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">' +
+          '<div class="card-title">All Employees</div>' +
+          '<button class="pf-btn primary" onclick="toast(\'Add Employee form coming soon\')">+ Add Employee</button>' +
+        '</div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr>' +
+            '<th>Name</th><th>Title</th><th>Department</th><th>Location</th><th>Start Date</th><th>Status</th>' +
+          '</tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>' +
+      '<div id="employee-detail"></div>';
+  }
+
+  function showEmployee(id) {
+    var e = STATE.employees.find(function(emp) { return emp.id === id; });
+    if (!e) return;
+
+    var info = function(k, v) {
+      return '<div class="info-row"><span class="info-key">' + k + '</span><span class="info-val">' + esc(v) + '</span></div>';
+    };
+
+    document.getElementById('employee-detail').innerHTML = '' +
+      '<div class="pf-card accent-gold" style="margin-top:.8rem;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">' +
+          '<div class="card-title">' + esc(e.name) + '</div>' +
+          '<button class="pf-btn outline sm" onclick="document.getElementById(\'employee-detail\').innerHTML=\'\'">Close</button>' +
+        '</div>' +
+        info('Employee ID', e.id) +
+        info('Title', e.title) +
+        info('Department', e.department) +
+        info('Email', e.email) +
+        info('Phone', e.phone) +
+        info('Location', e.location) +
+        info('Start Date', e.startDate) +
+        info('Emergency Contact', e.emergencyContact) +
+        info('Status', e.status.charAt(0).toUpperCase() + e.status.slice(1)) +
+      '</div>';
+  }
+
+  /* ================================================================
+     TAB: ONBOARDING
+     ================================================================ */
+
+  function renderOnboarding() {
+    var done = STATE.onboardingTasks.filter(function(t){return t.status==='done'}).length;
+    var total = STATE.onboardingTasks.length;
+    var pct = Math.round((done/total)*100);
+
+    var pillHtml = function(s) {
+      return '<span class="status-pill ' + s + '" title="' + s + '"></span>';
+    };
+
+    var rows = STATE.onboardingTasks.map(function(t) {
+      return '<tr>' +
+        '<td>' + pillHtml(t.status) + '</td>' +
+        '<td>' + esc(t.task) + '</td>' +
+        '<td><span class="pf-chip muted">' + t.dueDay + '</span></td>' +
+        '<td>' + (t.status === 'pending' ? '<button class="pf-btn secondary sm" onclick="advanceTask(' + t.id + ')">Start</button>' : t.status === 'in-progress' ? '<button class="pf-btn primary sm" onclick="completeTask(' + t.id + ')">Complete</button>' : '<span style="color:var(--pf-green);">Done</span>') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    return '' +
+      '<div class="pf-card accent-orange">' +
+        '<div class="card-title">Onboarding: Sarah Okafor (Estimator)</div>' +
+        '<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">' +
+          '<div style="flex:1;"><div class="pf-progress"><div class="pf-progress-bar" style="width:' + pct + '%;background:var(--pf-orange);"></div></div></div>' +
+          '<div style="font-weight:700;color:var(--pf-orange);">' + pct + '% (' + done + '/' + total + ')</div>' +
+        '</div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr><th style="width:30px;">Status</th><th>Task</th><th>Due</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function advanceTask(id) {
+    var t = STATE.onboardingTasks.find(function(task){return task.id===id});
+    if (t) { t.status = 'in-progress'; render(); toast('Task started: ' + t.task); }
+  }
+
+  function completeTask(id) {
+    var t = STATE.onboardingTasks.find(function(task){return task.id===id});
+    if (t) { t.status = 'done'; render(); toast('Task completed: ' + t.task); }
+  }
+
+  /* ================================================================
+     TAB: POLICIES
+     ================================================================ */
+
+  function renderPolicies() {
+    var acked = STATE.policies.filter(function(p){return p.status==='acknowledged'}).length;
+
+    var rows = STATE.policies.map(function(p) {
+      var statusHtml = p.status === 'acknowledged'
+        ? '<span class="pf-chip green">SIGNED</span>'
+        : '<span class="pf-chip orange">PENDING</span>';
+      var actionHtml = p.status === 'pending'
+        ? '<button class="pf-btn primary sm" onclick="acknowledgePolicy(' + p.id + ')">Review & Sign</button>'
+        : '<span style="color:var(--pf-muted);font-size:.75rem;">Signed</span>';
+      return '<tr>' +
+        '<td><strong>' + esc(p.name) + '</strong></td>' +
+        '<td><span class="pf-chip blue">' + p.jurisdiction + '</span></td>' +
+        '<td><span class="pf-chip muted">' + p.category + '</span></td>' +
+        '<td>' + p.version + '</td>' +
+        '<td>' + statusHtml + '</td>' +
+        '<td>' + actionHtml + '</td>' +
+      '</tr>';
+    }).join('');
+
+    return '' +
+      '<div class="pf-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">' +
+          '<div class="card-title">Policy Library</div>' +
+          '<div><span class="pf-chip green">' + acked + ' SIGNED</span> <span class="pf-chip orange">' + (STATE.policies.length - acked) + ' PENDING</span></div>' +
+        '</div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr><th>Policy</th><th>Jurisdiction</th><th>Category</th><th>Version</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function acknowledgePolicy(id) {
+    var p = STATE.policies.find(function(pol){return pol.id===id});
+    if (p) { p.status = 'acknowledged'; render(); toast('Policy signed: ' + p.name); }
+  }
+
+  /* ================================================================
+     TAB: TIME OFF
+     ================================================================ */
+
+  function renderTimeOff() {
+    var balanceCards = STATE.ptoBalances.map(function(b) {
+      var remaining = b.total - b.used - b.pending;
+      var colors = { 'Vacation': 'var(--pf-blue)', 'Sick Days': 'var(--pf-orange)', 'Personal Days': 'var(--pf-green)', 'Bereavement': 'var(--pf-muted)' };
+      var c = colors[b.type] || 'var(--pf-blue)';
+      var pct = b.total > 0 ? Math.round((b.used/b.total)*100) : 0;
+      return '<div class="stat-box">' +
+        '<div style="font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--pf-muted);margin-bottom:.4rem;">' + b.type + '</div>' +
+        '<div class="stat-value" style="color:' + c + ';">' + remaining + '</div>' +
+        '<div style="font-size:.6rem;color:var(--pf-muted);margin-top:.2rem;">of ' + b.total + ' remaining</div>' +
+        '<div class="pf-progress"><div class="pf-progress-bar" style="width:' + pct + '%;background:' + c + ';"></div></div>' +
+      '</div>';
+    }).join('');
+
+    var statusChip = function(s) {
+      if (s === 'approved') return '<span class="pf-chip green">APPROVED</span>';
+      if (s === 'pending') return '<span class="pf-chip orange">PENDING</span>';
+      if (s === 'denied') return '<span class="pf-chip red">DENIED</span>';
+      return '<span class="pf-chip muted">' + s + '</span>';
+    };
+
+    var rows = STATE.ptoRequests.map(function(r) {
+      var actions = r.status === 'pending'
+        ? '<button class="pf-btn secondary sm" onclick="approvePTO(' + r.id + ')">Approve</button> <button class="pf-btn outline sm" onclick="denyPTO(' + r.id + ')">Deny</button>'
+        : '';
+      return '<tr>' +
+        '<td><strong>' + esc(r.employee) + '</strong></td>' +
+        '<td><span class="pf-chip muted">' + r.type + '</span></td>' +
+        '<td>' + r.start + '</td>' +
+        '<td>' + r.end + '</td>' +
+        '<td>' + r.days + '</td>' +
+        '<td>' + statusChip(r.status) + '</td>' +
+        '<td>' + esc(r.reason) + '</td>' +
+        '<td>' + actions + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* Request form */
+    var formHtml = '<div class="pf-card accent-green" style="margin-bottom:.8rem;">' +
+      '<div class="card-title">Request Time Off</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;">' +
+        '<div class="field-group"><label class="field-label">Type</label><select class="pf-select" id="pto-type"><option>Vacation</option><option>Sick Day</option><option>Personal Day</option><option>Bereavement</option></select></div>' +
+        '<div class="field-group"><label class="field-label">Start Date</label><input type="date" class="pf-input" id="pto-start"></div>' +
+        '<div class="field-group"><label class="field-label">End Date</label><input type="date" class="pf-input" id="pto-end"></div>' +
+        '<div class="field-group"><label class="field-label">Reason (optional)</label><input type="text" class="pf-input" id="pto-reason" placeholder="Brief note"></div>' +
+      '</div>' +
+      '<button class="pf-btn primary" onclick="submitPTO()" style="margin-top:.6rem;">Submit Request</button>' +
+    '</div>';
+
+    return '' +
+      '<div class="pf-grid-sm" style="margin-bottom:1rem;">' + balanceCards + '</div>' +
+      formHtml +
+      '<div class="pf-card">' +
+        '<div class="card-title">Team Requests</div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr><th>Employee</th><th>Type</th><th>Start</th><th>End</th><th>Days</th><th>Status</th><th>Reason</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function approvePTO(id) {
+    var r = STATE.ptoRequests.find(function(req){return req.id===id});
+    if (r) { r.status = 'approved'; render(); toast('Approved: ' + r.employee + ' ' + r.type); }
+  }
+
+  function denyPTO(id) {
+    var r = STATE.ptoRequests.find(function(req){return req.id===id});
+    if (r) { r.status = 'denied'; render(); toast('Denied: ' + r.employee + ' ' + r.type); }
+  }
+
+  function submitPTO() {
+    toast('Time off request submitted. Manager will be notified.');
+  }
+
+  /* -- Init -- */
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!IN_IFRAME) render();
+  });
+</script>
+</body>
+</html>
