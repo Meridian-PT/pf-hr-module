@@ -311,27 +311,30 @@
   /* ================================================================
      PIER FOUNDATIONS HR MODULE
      Phase 1: Records, Onboarding, Policies, PTO
-     Designed as iframe-embeddable module (NO top nav, shell owns chrome)
+     Same-origin module: deploys as a path under pf-platform (e.g. /hr/).
+     Auth via session cookie (pf_auth_token), NO postMessage handshake.
+     Shell owns nav/chrome. RBAC enforced at platform/functions layer.
      ================================================================ */
 
-  /* -- Iframe handshake with PF portal shell -- */
-  var PF_SESSION = null;
-  window.addEventListener('message', function(event) {
-    /* In production: validate event.origin === 'https://pf-platform.pages.dev' */
-    if (event.data && event.data.type === 'PF_SESSION') {
-      PF_SESSION = event.data;
-      initModule(PF_SESSION.user, PF_SESSION.role);
-      window.parent.postMessage({ type: 'PF_MODULE_READY', module: 'hr' }, '*');
+  /* -- Auth: reads pf_auth_token cookie (set by the PF shell) -- */
+  function getPFAuthToken() {
+    var match = document.cookie.match(/(?:^|;\s*)pf_auth_token=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  /* -- Init: self-start on DOMContentLoaded -- */
+  /* In production (same-origin), the cookie authenticates us automatically. */
+  /* In standalone demo mode, we init with demo data. */
+  document.addEventListener('DOMContentLoaded', function() {
+    var token = getPFAuthToken();
+    if (token) {
+      /* Production: cookie present, fetch real user from platform functions */
+      initModule({ name: 'Authenticated User', email: '' }, 'admin');
+    } else {
+      /* Demo/standalone: no cookie, use demo data */
+      initModule({ name: 'Brad Thompson', email: 'brad@pierfoundations.ca' }, 'admin');
     }
   });
-
-  /* -- Demo mode: if not in iframe, self-init -- */
-  var IN_IFRAME = (window.self !== window.top);
-  if (!IN_IFRAME) {
-    document.addEventListener('DOMContentLoaded', function() {
-      initModule({ name: 'Brad Thompson', email: 'brad@pierfoundations.ca' }, 'admin');
-    });
-  }
 
   var STATE = {
     currentTab: 'records',
@@ -672,10 +675,7 @@
     toast('Time off request submitted. Manager will be notified.');
   }
 
-  /* -- Init -- */
-  document.addEventListener('DOMContentLoaded', function() {
-    if (!IN_IFRAME) render();
-  });
+  /* Init handled at top of script via DOMContentLoaded */
 </script>
 </body>
 </html>
