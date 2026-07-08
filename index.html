@@ -386,6 +386,37 @@
       { id: 3, employee: 'Tina Marchetti', type: 'Vacation', start: '2026-08-11', end: '2026-08-15', days: 5, status: 'approved', reason: 'Summer holiday' },
       { id: 4, employee: 'Marcus Chen', type: 'Personal', start: '2026-07-14', end: '2026-07-14', days: 1, status: 'pending', reason: 'Moving day' },
       { id: 5, employee: 'Priya Shah', type: 'Vacation', start: '2026-07-28', end: '2026-07-30', days: 3, status: 'pending', reason: 'Trip to Montreal' }
+    ],
+    /* Phase 2 data */
+    reviews: [
+      { empId: 'PF-0001', name: 'Brad Thompson', title: 'President', selfDone: true, mgrDone: true, rating: 4.5, goalsMetStr: '5/5', status: 'completed' },
+      { empId: 'PF-0002', name: 'Peter Novak', title: 'VP Operations', selfDone: true, mgrDone: true, rating: 4.2, goalsMetStr: '4/5', status: 'completed' },
+      { empId: 'PF-0003', name: 'Jamie Reeves', title: 'Project Manager', selfDone: true, mgrDone: false, rating: null, goalsMetStr: '3/4', status: 'in-progress' },
+      { empId: 'PF-0004', name: 'Tina Marchetti', title: 'Office Manager', selfDone: true, mgrDone: false, rating: null, goalsMetStr: '4/4', status: 'in-progress' },
+      { empId: 'PF-0005', name: 'Dylan Osei', title: 'Site Supervisor', selfDone: false, mgrDone: false, rating: null, goalsMetStr: '2/4', status: 'pending' },
+      { empId: 'PF-0006', name: 'Priya Shah', title: 'Bookkeeper', selfDone: false, mgrDone: false, rating: null, goalsMetStr: '3/3', status: 'pending' },
+      { empId: 'PF-0007', name: 'Marcus Chen', title: 'Field Technician', selfDone: false, mgrDone: false, rating: null, goalsMetStr: '2/3', status: 'pending' }
+    ],
+    orgChart: {
+      departments: [
+        { name: 'Executive', head: 'Brad Thompson', count: 1, roles: ['President'] },
+        { name: 'Operations', head: 'Peter Novak', count: 3, roles: ['VP Operations', 'Project Manager', 'Estimator'] },
+        { name: 'Field Ops', head: 'Dylan Osei', count: 2, roles: ['Site Supervisor', 'Field Technician'] },
+        { name: 'Admin', head: 'Tina Marchetti', count: 1, roles: ['Office Manager'] },
+        { name: 'Finance', head: 'Priya Shah', count: 1, roles: ['Bookkeeper'] }
+      ]
+    },
+    compliance: [
+      { item: 'OHSA Health & Safety Training', category: 'Safety', dueDate: '2026-08-01', completed: 6, total: 8, status: 'in-progress' },
+      { item: 'Workplace Harassment Training (Bill 190)', category: 'Compliance', dueDate: '2026-07-15', completed: 8, total: 8, status: 'done' },
+      { item: 'WHMIS/GHS Certification', category: 'Safety', dueDate: '2026-09-01', completed: 3, total: 4, status: 'in-progress' },
+      { item: 'Fall Protection Certificate', category: 'Construction', dueDate: '2026-07-30', completed: 2, total: 2, status: 'done' },
+      { item: 'Confined Space Entry Cert', category: 'Construction', dueDate: '2026-08-15', completed: 1, total: 2, status: 'in-progress' },
+      { item: 'First Aid/CPR (Level C)', category: 'Safety', dueDate: '2026-10-01', completed: 4, total: 8, status: 'in-progress' },
+      { item: 'Working at Heights', category: 'Construction', dueDate: '2026-08-01', completed: 2, total: 2, status: 'done' },
+      { item: 'Privacy & Confidentiality Ack', category: 'Compliance', dueDate: '2026-07-01', completed: 7, total: 8, status: 'in-progress' },
+      { item: 'Vehicle/Fleet Safety Review', category: 'Safety', dueDate: '2026-09-15', completed: 0, total: 3, status: 'pending' },
+      { item: 'AODA Accessibility Training', category: 'Compliance', dueDate: '2026-12-31', completed: 5, total: 8, status: 'in-progress' }
     ]
   };
 
@@ -418,7 +449,10 @@
       { id: 'records', label: 'Employee Records' },
       { id: 'onboarding', label: 'Onboarding' },
       { id: 'policies', label: 'Policies' },
-      { id: 'timeoff', label: 'Time Off' }
+      { id: 'timeoff', label: 'Time Off' },
+      { id: 'performance', label: 'Performance' },
+      { id: 'orgchart', label: 'Org Chart' },
+      { id: 'compliance', label: 'Compliance' }
     ];
 
     var tabNav = '<div class="tab-nav">' + tabs.map(function(t) {
@@ -431,14 +465,21 @@
       case 'onboarding': content = renderOnboarding(); break;
       case 'policies': content = renderPolicies(); break;
       case 'timeoff': content = renderTimeOff(); break;
+      case 'performance': content = renderPerformance(); break;
+      case 'orgchart': content = renderOrgChart(); break;
+      case 'compliance': content = renderCompliance(); break;
     }
 
     /* Stats bar */
+    var reviewsDone = STATE.reviews.filter(function(r){return r.status==='completed'}).length;
+    var compDone = STATE.compliance.filter(function(c){return c.status==='done'}).length;
     var stats = '<div class="pf-grid-sm" style="margin-bottom:1.4rem;">' +
       '<div class="stat-box"><div class="stat-value">' + STATE.employees.length + '</div><div class="stat-label">Employees</div></div>' +
       '<div class="stat-box"><div class="stat-value">' + STATE.employees.filter(function(e){return e.status==='onboarding'}).length + '</div><div class="stat-label">Onboarding</div></div>' +
       '<div class="stat-box"><div class="stat-value" style="color:var(--pf-green);">' + STATE.policies.filter(function(p){return p.status==='acknowledged'}).length + '/' + STATE.policies.length + '</div><div class="stat-label">Policies Signed</div></div>' +
       '<div class="stat-box"><div class="stat-value" style="color:var(--pf-orange);">' + STATE.ptoRequests.filter(function(r){return r.status==='pending'}).length + '</div><div class="stat-label">PTO Pending</div></div>' +
+      '<div class="stat-box"><div class="stat-value" style="color:var(--pf-blue);">' + reviewsDone + '/' + STATE.reviews.length + '</div><div class="stat-label">Reviews Done</div></div>' +
+      '<div class="stat-box"><div class="stat-value" style="color:var(--pf-green);">' + compDone + '/' + STATE.compliance.length + '</div><div class="stat-label">Compliance</div></div>' +
     '</div>';
 
     document.getElementById('app').innerHTML = '' +
@@ -673,6 +714,220 @@
 
   function submitPTO() {
     toast('Time off request submitted. Manager will be notified.');
+  }
+
+  /* ================================================================
+     TAB: PERFORMANCE REVIEWS
+     ================================================================ */
+
+  function renderPerformance() {
+    var done = STATE.reviews.filter(function(r){return r.status==='completed'}).length;
+    var inProg = STATE.reviews.filter(function(r){return r.status==='in-progress'}).length;
+    var pending = STATE.reviews.filter(function(r){return r.status==='pending'}).length;
+    var total = STATE.reviews.length;
+    var pct = Math.round((done/total)*100);
+
+    var check = function(v) { return v ? '<span style="color:var(--pf-green);">&#x2714;</span>' : '<span style="color:var(--pf-muted-light);">&#x2014;</span>'; };
+    var statusChip = function(s) {
+      if (s === 'completed') return '<span class="pf-chip green">DONE</span>';
+      if (s === 'in-progress') return '<span class="pf-chip orange">IN PROGRESS</span>';
+      return '<span class="pf-chip muted">NOT STARTED</span>';
+    };
+
+    var rows = STATE.reviews.map(function(r) {
+      return '<tr>' +
+        '<td><strong>' + esc(r.name) + '</strong><br><span style="font-size:.75rem;color:var(--pf-muted-light);">' + r.title + '</span></td>' +
+        '<td>' + check(r.selfDone) + ' Self</td>' +
+        '<td>' + check(r.mgrDone) + ' Manager</td>' +
+        '<td>' + (r.rating ? '<span style="color:var(--pf-blue);font-weight:700;">' + r.rating + '/5</span>' : '<span style="color:var(--pf-muted-light);">--</span>') + '</td>' +
+        '<td>' + r.goalsMetStr + '</td>' +
+        '<td>' + statusChip(r.status) + '</td>' +
+        '<td>' + (r.status !== 'completed' ? '<button class="pf-btn secondary sm" onclick="toast(\'Opening review for ' + esc(r.name) + '\')">Open</button>' : '<span style="color:var(--pf-muted-light);font-size:.75rem;">View</span>') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* Review cycle header */
+    var cycleCard = '<div class="pf-card accent-blue" style="margin-bottom:.8rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">' +
+        '<div class="card-title">Q3 2026 Mid-Year Review Cycle</div>' +
+        '<span class="pf-chip ' + (pct === 100 ? 'green' : 'orange') + '">' + (pct === 100 ? 'COMPLETE' : 'IN PROGRESS') + '</span>' +
+      '</div>' +
+      '<div class="pf-grid-sm" style="margin-bottom:.8rem;">' +
+        '<div class="stat-box"><div class="stat-value" style="color:var(--pf-blue);">' + total + '</div><div class="stat-label">Total</div></div>' +
+        '<div class="stat-box"><div class="stat-value" style="color:var(--pf-green);">' + done + '</div><div class="stat-label">Done</div></div>' +
+        '<div class="stat-box"><div class="stat-value" style="color:var(--pf-orange);">' + inProg + '</div><div class="stat-label">In Progress</div></div>' +
+        '<div class="stat-box"><div class="stat-value" style="color:var(--pf-muted-light);">' + pending + '</div><div class="stat-label">Not Started</div></div>' +
+      '</div>' +
+      '<div class="pf-progress"><div class="pf-progress-bar" style="width:' + pct + '%;background:var(--pf-blue);"></div></div>' +
+      '<div style="font-size:.75rem;color:var(--pf-muted-light);margin-top:.5rem;">Deadline: August 1, 2026</div>' +
+    '</div>';
+
+    /* Review template */
+    var templateCard = '<div class="pf-card accent-gold" style="margin-bottom:.8rem;">' +
+      '<div class="card-title">Review Template</div>' +
+      '<div class="pf-grid">' +
+        '<div style="background:var(--pf-bg-light);padding:1rem;border:1px solid var(--pf-border-light);border-radius:8px;">' +
+          '<div class="section-label blue">SECTION 1: GOAL REVIEW</div>' +
+          '<ul style="color:var(--pf-muted-light);font-size:.82rem;padding-left:1rem;line-height:2;">' +
+            '<li>Review each goal from Q1</li><li>Rate: Exceeded / Met / Partially Met / Not Met</li><li>Evidence and examples</li><li>Blockers encountered</li>' +
+          '</ul></div>' +
+        '<div style="background:var(--pf-bg-light);padding:1rem;border:1px solid var(--pf-border-light);border-radius:8px;">' +
+          '<div class="section-label">SECTION 2: COMPETENCIES</div>' +
+          '<ul style="color:var(--pf-muted-light);font-size:.82rem;padding-left:1rem;line-height:2;">' +
+            '<li>Rate 1-5 per company value</li><li>Technical / communication / leadership</li><li>Safety awareness (field roles)</li><li>Specific examples required</li>' +
+          '</ul></div>' +
+        '<div style="background:var(--pf-bg-light);padding:1rem;border:1px solid var(--pf-border-light);border-radius:8px;">' +
+          '<div class="section-label blue">SECTION 3: DEVELOPMENT</div>' +
+          '<ul style="color:var(--pf-muted-light);font-size:.82rem;padding-left:1rem;line-height:2;">' +
+            '<li>Strengths to leverage</li><li>Growth areas (max 2)</li><li>Training / certifications needed</li><li>Q3-Q4 goals (SMART)</li>' +
+          '</ul></div>' +
+        '<div style="background:var(--pf-bg-light);padding:1rem;border:1px solid var(--pf-border-light);border-radius:8px;">' +
+          '<div class="section-label">SECTION 4: SELF-ASSESSMENT</div>' +
+          '<ul style="color:var(--pf-muted-light);font-size:.82rem;padding-left:1rem;line-height:2;">' +
+            '<li>Proudest achievement this half</li><li>Biggest challenge faced</li><li>What support do you need?</li><li>Career aspirations (1yr / 3yr)</li>' +
+          '</ul></div>' +
+      '</div>' +
+    '</div>';
+
+    return cycleCard +
+      '<div class="pf-card">' +
+        '<div class="card-title">Team Reviews</div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr><th>Employee</th><th>Self</th><th>Manager</th><th>Rating</th><th>Goals</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>' +
+      templateCard;
+  }
+
+  /* ================================================================
+     TAB: ORG CHART & JOB DESCRIPTIONS
+     ================================================================ */
+
+  function renderOrgChart() {
+    var deptCards = STATE.orgChart.departments.map(function(dept) {
+      var empList = STATE.employees.filter(function(e) { return e.department === dept.name; });
+      var empRows = empList.map(function(e) {
+        var statusChip = e.status === 'active' ? '<span class="pf-chip green">ACTIVE</span>' : '<span class="pf-chip orange">ONBOARDING</span>';
+        return '<tr>' +
+          '<td><strong>' + esc(e.name) + '</strong></td>' +
+          '<td>' + esc(e.title) + '</td>' +
+          '<td>' + esc(e.location) + '</td>' +
+          '<td>' + statusChip + '</td>' +
+        '</tr>';
+      }).join('');
+
+      var accentClass = { 'Executive': 'accent-gold', 'Operations': 'accent-blue', 'Field Ops': 'accent-orange', 'Admin': 'accent-green', 'Finance': '' }[dept.name] || '';
+
+      return '<div class="pf-card ' + accentClass + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">' +
+          '<div class="card-title">' + dept.name + '</div>' +
+          '<span class="pf-chip blue">' + dept.count + ' EMPLOYEE' + (dept.count > 1 ? 'S' : '') + '</span>' +
+        '</div>' +
+        '<div style="font-size:.82rem;color:var(--pf-muted-light);margin-bottom:.8rem;">Department Head: <strong style="color:var(--pf-text-light);">' + esc(dept.head) + '</strong></div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr><th>Name</th><th>Title</th><th>Location</th><th>Status</th></tr></thead><tbody>' + empRows + '</tbody></table>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    /* Headcount summary */
+    var byDept = STATE.orgChart.departments.map(function(d) {
+      return '<div class="stat-box"><div class="stat-value" style="color:var(--pf-blue);">' + d.count + '</div><div class="stat-label">' + d.name + '</div></div>';
+    }).join('');
+
+    var locations = {};
+    STATE.employees.forEach(function(e) {
+      var city = e.location.split(',')[0].trim();
+      locations[city] = (locations[city] || 0) + 1;
+    });
+    var locCards = Object.keys(locations).map(function(loc) {
+      return '<div class="stat-box"><div class="stat-value" style="color:var(--pf-green);">' + locations[loc] + '</div><div class="stat-label">' + loc + '</div></div>';
+    }).join('');
+
+    return '' +
+      '<div class="pf-card accent-blue" style="margin-bottom:.8rem;">' +
+        '<div class="card-title">Headcount by Department</div>' +
+        '<div class="pf-grid-sm">' + byDept + '</div>' +
+      '</div>' +
+      '<div class="pf-card accent-green" style="margin-bottom:.8rem;">' +
+        '<div class="card-title">Headcount by Location</div>' +
+        '<div class="pf-grid-sm">' + locCards + '</div>' +
+      '</div>' +
+      deptCards;
+  }
+
+  /* ================================================================
+     TAB: COMPLIANCE DASHBOARD
+     ================================================================ */
+
+  function renderCompliance() {
+    var done = STATE.compliance.filter(function(c){return c.status==='done'}).length;
+    var inProg = STATE.compliance.filter(function(c){return c.status==='in-progress'}).length;
+    var pending = STATE.compliance.filter(function(c){return c.status==='pending'}).length;
+    var total = STATE.compliance.length;
+    var overallPct = Math.round((done/total)*100);
+
+    var statusChip = function(s) {
+      if (s === 'done') return '<span class="pf-chip green">COMPLETE</span>';
+      if (s === 'in-progress') return '<span class="pf-chip orange">IN PROGRESS</span>';
+      return '<span class="pf-chip red">NOT STARTED</span>';
+    };
+
+    var rows = STATE.compliance.map(function(c) {
+      var pct = c.total > 0 ? Math.round((c.completed/c.total)*100) : 0;
+      var barColor = c.status === 'done' ? 'var(--pf-green)' : c.status === 'in-progress' ? 'var(--pf-orange)' : 'var(--pf-red)';
+      return '<tr>' +
+        '<td><strong>' + esc(c.item) + '</strong></td>' +
+        '<td><span class="pf-chip muted">' + c.category + '</span></td>' +
+        '<td>' + c.dueDate + '</td>' +
+        '<td>' + c.completed + '/' + c.total +
+          '<div class="pf-progress" style="margin-top:4px;"><div class="pf-progress-bar" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+        '</td>' +
+        '<td>' + statusChip(c.status) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* Expiring soon (due within 30 days) */
+    var today = new Date();
+    var thirtyDays = new Date(today.getTime() + 30*24*60*60*1000);
+    var expiring = STATE.compliance.filter(function(c) {
+      return c.status !== 'done' && new Date(c.dueDate) <= thirtyDays;
+    });
+
+    var alertHtml = '';
+    if (expiring.length > 0) {
+      alertHtml = '<div class="pf-card accent-red" style="margin-bottom:.8rem;">' +
+        '<div class="card-title" style="color:var(--pf-red);">Expiring Within 30 Days</div>' +
+        expiring.map(function(c) {
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--pf-border-light);">' +
+            '<div><strong>' + esc(c.item) + '</strong> <span class="pf-chip muted">' + c.category + '</span></div>' +
+            '<div style="font-size:.82rem;color:var(--pf-red);font-weight:600;">Due: ' + c.dueDate + ' (' + c.completed + '/' + c.total + ' done)</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    return '' +
+      '<div class="pf-card accent-blue" style="margin-bottom:.8rem;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">' +
+          '<div class="card-title">Compliance Overview</div>' +
+          '<span style="font-weight:700;color:var(--pf-blue);">' + overallPct + '% Complete</span>' +
+        '</div>' +
+        '<div class="pf-grid-sm" style="margin-bottom:.8rem;">' +
+          '<div class="stat-box"><div class="stat-value" style="color:var(--pf-blue);">' + total + '</div><div class="stat-label">Total Items</div></div>' +
+          '<div class="stat-box"><div class="stat-value" style="color:var(--pf-green);">' + done + '</div><div class="stat-label">Complete</div></div>' +
+          '<div class="stat-box"><div class="stat-value" style="color:var(--pf-orange);">' + inProg + '</div><div class="stat-label">In Progress</div></div>' +
+          '<div class="stat-box"><div class="stat-value" style="color:var(--pf-red);">' + pending + '</div><div class="stat-label">Not Started</div></div>' +
+        '</div>' +
+        '<div class="pf-progress" style="height:8px;"><div class="pf-progress-bar" style="width:' + overallPct + '%;background:var(--pf-green);"></div></div>' +
+      '</div>' +
+      alertHtml +
+      '<div class="pf-card">' +
+        '<div class="card-title">All Compliance Items</div>' +
+        '<div style="overflow-x:auto;">' +
+          '<table class="pf-table"><thead><tr><th>Item</th><th>Category</th><th>Due Date</th><th>Progress</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>';
   }
 
   /* Init handled at top of script via DOMContentLoaded */
